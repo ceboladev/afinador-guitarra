@@ -2,101 +2,77 @@ const noteNameEl = document.getElementById('note-name');
 const freqEl = document.getElementById('frequency');
 const pointer = document.getElementById('pointer');
 const startBtn = document.getElementById('start-btn');
-const strings = document.querySelectorAll('.string');
 
 let audioCtx;
 let analyser;
 let buffer;
+let rotationHistory = [];
+const SMOOTHING_AMOUNT = 5;
 
-// Tabela de frequências das notas (Escala Cromática)
+// Notas que o afinador vai reconhecer
 const noteStrings = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
 function getNote(frequency) {
-    // Cálculo matemático para converter frequência em nota musical
     const noteNum = 12 * (Math.log2(frequency / 440)) + 69;
     const noteIndex = Math.round(noteNum) % 12;
-    const detune = (noteNum - Math.round(noteNum)) * 100; // Quão longe do centro está (em cents)
-    return {
-        name: noteStrings[noteIndex],
-        detune: detune
-    };
+    const detune = (noteNum - Math.round(noteNum)) * 100;
+    return { name: noteStrings[noteIndex], detune: detune };
 }
 
-// Aumente o fftSize para 4096 para ter mais precisão no grave do violão (E2)
 async function startTuner() {
     try {
-        console.log("Iniciando afinador...");
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') await audioCtx.resume();
 
-        // 1. Criar o contexto de áudio IMEDIATAMENTE no clique
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-
-        // 2. Acordar o áudio (Essencial para Android/iOS)
-        if (audioCtx.state === 'suspended') {
-            await audioCtx.resume();
-        }
-
-        // 3. Solicitar microfone com tratamento de erro
         const stream = await navigator.mediaDevices.getUserMedia({ 
-            audio: {
-                echoCancellation: false,
-                autoGainControl: false,
-                noiseSuppression: false
-            } 
-        }).catch(e => {
-            console.error("Permissão negada:", e);
-            alert("Erro: O microfone foi negado ou você não está usando HTTPS.");
-            throw e;
+            audio: { echoCancellation: false, autoGainControl: false, noiseSuppression: false } 
         });
 
         const source = audioCtx.createMediaStreamSource(stream);
         analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 2048; 
+        analyser.fftSize = 4096; 
         buffer = new Float32Array(analyser.fftSize);
         source.connect(analyser);
 
-        // 4. SÓ MUDA O TEXTO SE TUDO ACIMA DEU CERTO
         startBtn.innerText = "OUVINDO...";
-        startBtn.style.background = "#333";
-        
-        console.log("Afinador rodando!");
         update();
-        
     } catch (err) {
-        console.error("Falha total:", err);
-        alert("O afinador não conseguiu iniciar. Detalhe: " + err.message);
+        alert("Erro no microfone: " + err);
     }
 }
 
 function update() {
     analyser.getFloatTimeDomainData(buffer);
-    
-    // O autoCorrelate precisa do buffer e do sampleRate
     const frequency = autoCorrelate(buffer, audioCtx.sampleRate);
 
-    // DEBUG: Se nada estiver acontecendo, vamos forçar o console a nos dizer
-    // Abra o F12 no navegador para ver se os números aparecem lá
-    console.log("Frequência detectada:", frequency);
-
-    if (frequency !== -1 && frequency > 20 && frequency < 2000) {
-
-        // Remove o brilho de todas as cordas primeiro
-document.querySelectorAll('.string').forEach(s => s.classList.remove('active'));
-
-// Procura a corda que corresponde à nota detectada e faz brilhar
-const activeString = document.querySelector(`.string[data-note*="${note.name}"]`);
-if (activeString) {
-    activeString.classList.add('active');
-}
+    if (frequency !== -1 && frequency < 1000) {
         const note = getNote(frequency);
-        const rotation = note.detune * 1.5; 
+        
+        // 1. ESTABILIZAÇÃO DO PONTEIRO
+        const targetRotation = note.detune * 1.5;
+        rotationHistory.push(targetRotation);
+        if (rotationHistory.length > SMOOTHING_AMOUNT) rotationHistory.shift();
+        const averageRotation = rotationHistory.reduce((a, b) => a + b) / rotationHistory.length;
 
-        pointer.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+        // Move o ponteiro
+        pointer.style.transform = `translateX(-50%) rotate(${averageRotation}deg)`;
         noteNameEl.innerText = note.name;
         freqEl.innerText = frequency.toFixed(1) + " Hz";
 
-        if (Math.abs(note.detune) < 5) {
+        // 2. LÓGICA DAS CORDAS (COM TRY/CATCH PARA NÃO TRAVAR O RESTO)
+        try {
+            // Limpa todas
+            document.querySelectorAll('.string').forEach(s => s.classList.remove('active'));
+            
+            // Procura a corda pelo data-note (Ex: nota "E" acende data-note="E")
+            const activeString = document.querySelector(`.string[data-note="${note.name}"]`);
+            if (activeString) {
+                activeString.classList.add('active');
+            }
+        } catch (e) { console.log("Erro visual nas cordas ignorado"); }
+
+        // Cor do ponteiro
+        if (Math.abs(averageRotation) < 5) {
             noteNameEl.style.color = "#2ecc71";
             pointer.style.background = "#2ecc71";
         } else {
@@ -107,15 +83,11 @@ if (activeString) {
     requestAnimationFrame(update);
 }
 
-// Algoritmo de Autocorrelação (detecta o tom real)
 function autoCorrelate(buf, sampleRate) {
     let SIZE = buf.length;
     let rms = 0;
-    for (let i = 0; i < SIZE; i++) {
-        val = buf[i];
-        rms += val * val;
-    }
-    if (Math.sqrt(rms / SIZE) < 0.005) return -1;
+    for (let i = 0; i < SIZE; i++) rms += buf[i] * buf[i];
+    if (Math.sqrt(rms / SIZE) < 0.005) return -1; // Sensibilidade ajustada
 
     let r1 = 0, r2 = SIZE - 1, thres = 0.2;
     for (let i = 0; i < SIZE / 2; i++) if (Math.abs(buf[i]) < thres) { r1 = i; break; }
@@ -123,7 +95,6 @@ function autoCorrelate(buf, sampleRate) {
 
     buf = buf.slice(r1, r2);
     SIZE = buf.length;
-
     let c = new Array(SIZE).fill(0);
     for (let i = 0; i < SIZE; i++)
         for (let j = 0; j < SIZE - i; j++)
@@ -132,15 +103,9 @@ function autoCorrelate(buf, sampleRate) {
     let d = 0; while (c[d] > c[d + 1]) d++;
     let maxval = -1, maxpos = -1;
     for (let i = d; i < SIZE; i++) {
-        if (c[i] > maxval) {
-            maxval = c[i];
-            maxpos = i;
-        }
+        if (c[i] > maxval) { maxval = c[i]; maxpos = i; }
     }
     return sampleRate / maxpos;
 }
 
-// Evento de clique no botão
-startBtn.addEventListener('click', () => {
-    startTuner();
-});
+startBtn.addEventListener('click', startTuner);

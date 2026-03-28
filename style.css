@@ -1,0 +1,38 @@
+body { background: #1a1a1a; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; }
+.tuner-container { text-align: center; background: #222; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+
+.gauge {
+    position: relative;
+    width: 300px;
+    height: 150px;
+    border: 2px solid #444;
+    border-radius: 150px 150px 0 0;
+    overflow: hidden;
+    margin: 20px auto;
+}
+
+.pointer {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 4px;
+    height: 130px;
+    background: #ff4444;
+    transform-origin: bottom center;
+    transform: translateX(-50%) rotate(0deg);
+    transition: transform 0.1s ease-out;
+    z-index: 2;
+}
+
+.center-line {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    background: #00ff00;
+    opacity: 0.5;
+}
+
+.notes { font-size: 3rem; font-weight: bold; margin-top: 10px; color: #00ff00; }
+button { padding: 10px 20px; cursor: pointer; background: #00ff00; border: none; border-radius: 5px; font-weight: bold; }

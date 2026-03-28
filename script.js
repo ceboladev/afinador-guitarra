@@ -25,29 +25,47 @@ function getNote(frequency) {
 // Aumente o fftSize para 4096 para ter mais precisão no grave do violão (E2)
 async function startTuner() {
     try {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') await audioCtx.resume();
+        console.log("Iniciando afinador...");
 
-        // Configurações críticas para Músicos: Desliga filtros de voz
+        // 1. Criar o contexto de áudio IMEDIATAMENTE no clique
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        // 2. Acordar o áudio (Essencial para Android/iOS)
+        if (audioCtx.state === 'suspended') {
+            await audioCtx.resume();
+        }
+
+        // 3. Solicitar microfone com tratamento de erro
         const stream = await navigator.mediaDevices.getUserMedia({ 
             audio: {
                 echoCancellation: false,
                 autoGainControl: false,
-                noiseSuppression: false,
-                latency: 0
+                noiseSuppression: false
             } 
+        }).catch(e => {
+            console.error("Permissão negada:", e);
+            alert("Erro: O microfone foi negado ou você não está usando HTTPS.");
+            throw e;
         });
 
         const source = audioCtx.createMediaStreamSource(stream);
         analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 4096; // Dobramos o tamanho para pegar notas baixas
+        analyser.fftSize = 2048; 
         buffer = new Float32Array(analyser.fftSize);
         source.connect(analyser);
 
+        // 4. SÓ MUDA O TEXTO SE TUDO ACIMA DEU CERTO
         startBtn.innerText = "OUVINDO...";
+        startBtn.style.background = "#333";
+        
+        console.log("Afinador rodando!");
         update();
+        
     } catch (err) {
-        alert("Erro: " + err);
+        console.error("Falha total:", err);
+        alert("O afinador não conseguiu iniciar. Detalhe: " + err.message);
     }
 }
 

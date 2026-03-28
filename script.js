@@ -22,70 +22,61 @@ function getNote(frequency) {
     };
 }
 
+// Aumente o fftSize para 4096 para ter mais precisão no grave do violão (E2)
 async function startTuner() {
     try {
-        // 1. Inicializa o contexto de áudio (Necessário clique do usuário)
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
-        // 2. Garante que o áudio não esteja suspenso (comum em celulares)
-        if (audioCtx.state === 'suspended') {
-            await audioCtx.resume();
-        }
+        if (audioCtx.state === 'suspended') await audioCtx.resume();
 
-        // 3. Pede permissão do microfone
+        // Configurações críticas para Músicos: Desliga filtros de voz
         const stream = await navigator.mediaDevices.getUserMedia({ 
             audio: {
                 echoCancellation: false,
                 autoGainControl: false,
-                noiseSuppression: false
+                noiseSuppression: false,
+                latency: 0
             } 
         });
 
         const source = audioCtx.createMediaStreamSource(stream);
         analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 2048; 
+        analyser.fftSize = 4096; // Dobramos o tamanho para pegar notas baixas
         buffer = new Float32Array(analyser.fftSize);
         source.connect(analyser);
 
-        // Muda o texto do botão para indicar que está ouvindo
         startBtn.innerText = "OUVINDO...";
-        startBtn.style.background = "#333";
-        startBtn.disabled = true;
-
         update();
     } catch (err) {
-        console.error("Erro:", err);
-        alert("Erro ao acessar microfone. Verifique se o site está em HTTPS!");
+        alert("Erro: " + err);
     }
 }
 
 function update() {
     analyser.getFloatTimeDomainData(buffer);
+    
+    // O autoCorrelate precisa do buffer e do sampleRate
     const frequency = autoCorrelate(buffer, audioCtx.sampleRate);
 
-    if (frequency !== -1 && frequency < 1000) {
+    // DEBUG: Se nada estiver acontecendo, vamos forçar o console a nos dizer
+    // Abra o F12 no navegador para ver se os números aparecem lá
+    console.log("Frequência detectada:", frequency);
+
+    if (frequency !== -1 && frequency > 20 && frequency < 2000) {
         const note = getNote(frequency);
-        
-        // Move o ponteiro: note.detune vai de -50 a 50
-        // Multiplicamos por 1.2 para o ponteiro percorrer mais o arco
-        const rotation = note.detune * 1.2; 
-        
-        // IMPORTANTE: Mantemos o translateX(-50%) para ele não sair do centro
+        const rotation = note.detune * 1.5; 
+
         pointer.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
-        
         noteNameEl.innerText = note.name;
         freqEl.innerText = frequency.toFixed(1) + " Hz";
 
-        // Cor de feedback (Verde se estiver afinado)
         if (Math.abs(note.detune) < 5) {
-            noteNameEl.style.color = "#2ecc71"; // Verde
+            noteNameEl.style.color = "#2ecc71";
             pointer.style.background = "#2ecc71";
         } else {
             noteNameEl.style.color = "white";
-            pointer.style.background = "#FF6B00"; // Laranja Cifra
+            pointer.style.background = "#FF6B00";
         }
     }
-
     requestAnimationFrame(update);
 }
 
@@ -97,7 +88,7 @@ function autoCorrelate(buf, sampleRate) {
         val = buf[i];
         rms += val * val;
     }
-    if (Math.sqrt(rms / SIZE) < 0.01) return -1;
+    if (Math.sqrt(rms / SIZE) < 0.001) return -1;
 
     let r1 = 0, r2 = SIZE - 1, thres = 0.2;
     for (let i = 0; i < SIZE / 2; i++) if (Math.abs(buf[i]) < thres) { r1 = i; break; }

@@ -1,53 +1,72 @@
+/* Paleta de Cores Cifra Club */
 :root {
     --cifra-orange: #FF6B00;
-    --cifra-bg: #121212;
-    --cifra-card: #1C1C1C;
-    --cifra-gray: #333333;
+    --cifra-bg: #0b0b0b;
+    --cifra-card: #1c1c1c;
+    --cifra-gray-text: #999999;
+    --cifra-border: #333333;
     --cifra-green: #2ecc71;
+    --cifra-red: #e74c3c;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent; /* Remove brilho azul ao tocar no celular */
 }
 
 body {
+    margin: 0;
+    padding: 0;
     background-color: var(--cifra-bg);
+    color: white;
     font-family: 'Roboto', sans-serif;
     display: flex;
     justify-content: center;
-    padding-top: 50px;
-    margin: 0;
+    align-items: center;
+    min-height: 100vh;
 }
 
 .cifra-tuner {
-    width: 350px;
+    width: 95%;
+    max-width: 360px;
     background: var(--cifra-card);
-    border-radius: 12px;
-    padding: 20px;
+    border-radius: 16px;
+    padding: 25px;
     text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
 }
 
 .header-cifra {
     display: flex;
     align-items: center;
-    gap: 10px;
-    color: #999;
-    font-size: 14px;
-    margin-bottom: 30px;
+    justify-content: center;
+    gap: 8px;
+    color: var(--cifra-gray-text);
+    font-size: 12px;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
 }
 
-/* O Arco */
+/* Área do Medidor (Arco) */
+.tuner-display {
+    position: relative;
+    padding: 20px 0;
+}
+
 .arc-container {
     position: relative;
-    width: 260px;
-    height: 130px;
+    width: 280px;
+    height: 140px;
     margin: 0 auto;
-    overflow: hidden;
+    overflow: hidden; /* Corta a metade de baixo do círculo */
 }
 
 .arc-bg {
-    width: 260px;
-    height: 260px;
-    border: 8px solid var(--cifra-gray);
+    width: 280px;
+    height: 280px;
+    border: 6px solid var(--cifra-border);
     border-radius: 50%;
-    box-sizing: border-box;
 }
 
 .pointer-cifra {
@@ -55,61 +74,76 @@ body {
     bottom: 0;
     left: 50%;
     width: 4px;
-    height: 110px;
+    height: 125px;
     background: var(--cifra-orange);
+    /* O transform-origin é o pulo do gato para o ponteiro girar da base */
     transform-origin: bottom center;
     transform: translateX(-50%) rotate(0deg);
     z-index: 10;
-    transition: transform 0.1s ease-out;
+    transition: transform 0.1s ease-out, background 0.2s;
+    box-shadow: 0 0 10px rgba(255, 107, 0, 0.4);
 }
 
 .center-marker {
     position: absolute;
     bottom: 0;
     left: 50%;
-    width: 4px;
-    height: 20px;
+    width: 6px;
+    height: 25px;
     background: var(--cifra-green);
     transform: translateX(-50%);
+    border-radius: 2px 2px 0 0;
+    z-index: 5;
 }
 
-/* Nota e Frequência */
-.note-info h2 {
-    font-size: 80px;
-    margin: 10px 0;
-    color: white;
-}
-
-.note-info p {
-    color: #666;
+/* Informações da Nota */
+.note-info {
     margin-top: -10px;
 }
 
-/* Seletor de Cordas */
+#note-name {
+    font-size: 90px;
+    font-weight: 900;
+    margin: 0;
+    line-height: 1;
+    color: white;
+    transition: color 0.2s;
+}
+
+#frequency {
+    color: var(--cifra-gray-text);
+    font-size: 16px;
+    margin: 5px 0 20px 0;
+}
+
+/* Seletor de Cordas Inferior */
 .string-selector {
     display: flex;
     justify-content: space-between;
-    margin: 30px 0;
-    border-top: 1px solid var(--cifra-gray);
-    padding-top: 20px;
+    margin: 20px 0;
+    border-top: 1px solid var(--cifra-border);
+    padding-top: 25px;
 }
 
 .string {
-    width: 40px;
-    height: 40px;
-    border: 2px solid var(--cifra-gray);
+    width: 42px;
+    height: 42px;
+    border: 2px solid var(--cifra-border);
     border-radius: 50%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: #999;
+    color: var(--cifra-gray-text);
     font-weight: bold;
-    font-size: 14px;
-    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.3s;
 }
 
-.string span { font-size: 10px; }
+.string span {
+    font-size: 9px;
+    opacity: 0.6;
+}
 
 .string.active {
     border-color: var(--cifra-orange);
@@ -117,13 +151,29 @@ body {
     background: rgba(255, 107, 0, 0.1);
 }
 
+/* Botão de Ação */
 #start-btn {
     background: var(--cifra-orange);
     border: none;
     width: 100%;
-    padding: 15px;
-    border-radius: 8px;
+    padding: 18px;
+    border-radius: 12px;
     color: white;
-    font-weight: bold;
+    font-weight: 900;
+    font-size: 16px;
     cursor: pointer;
+    margin-top: 10px;
+    transition: filter 0.2s;
+}
+
+#start-btn:active {
+    filter: brightness(0.8);
+}
+
+/* Ajustes para telas muito pequenas */
+@media (max-width: 350px) {
+    .arc-container { width: 240px; height: 120px; }
+    .arc-bg { width: 240px; height: 240px; }
+    .pointer-cifra { height: 105px; }
+    #note-name { font-size: 70px; }
 }

@@ -1,0 +1,22 @@
+{
+  "short_name": "Afinador",
+  "name": "Afinador Cifra Pro",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "background_color": "#0b0b0b",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#FF6B00",
+  "description": "Afinador de guitarra e violão estilo Cifra Club"
+}

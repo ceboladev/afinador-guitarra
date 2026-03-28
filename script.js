@@ -106,7 +106,7 @@ function autoCorrelate(buf, sampleRate) {
         val = buf[i];
         rms += val * val;
     }
-    if (Math.sqrt(rms / SIZE) < 0.001) return -1;
+    if (Math.sqrt(rms / SIZE) < 0.005) return -1;
 
     let r1 = 0, r2 = SIZE - 1, thres = 0.2;
     for (let i = 0; i < SIZE / 2; i++) if (Math.abs(buf[i]) < thres) { r1 = i; break; }

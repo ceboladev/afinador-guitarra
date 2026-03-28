@@ -1,40 +1,30 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Afinador Pro Max</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="bg-blobs"></div>
-    
-    <main class="tuner-card">
-        <header>
-            <h1>Tuner<span>.js</span></h1>
-            <div id="status-dot" class="dot"></div>
-        </header>
+<main class="cifra-tuner">
+    <div class="header-cifra">
+        <img src="https://www.cifraclub.com.br/favicon.ico" width="20" alt="logo">
+        <span>Afinador Cifra Club Style</span>
+    </div>
 
-        <div class="gauge-wrapper">
-            <div class="scale-marks"></div>
-            <div class="pointer" id="pointer"></div>
-            <div class="center-target"></div>
+    <div class="tuner-display">
+        <div class="arc-container">
+            <div class="arc-bg"></div>
+            <div class="pointer-cifra" id="pointer"></div>
+            <div class="center-marker"></div>
         </div>
-
-        <div class="display-section">
-            <div class="note-display">
-                <span id="note-name">--</span>
-                <small id="frequency">0.00 Hz</small>
-            </div>
+        
+        <div class="note-info">
+            <h2 id="note-name">E</h2>
+            <p id="frequency">0.0 Hz</p>
         </div>
+    </div>
 
-        <div class="strings-hint">
-            <span>E</span><span>A</span><span>D</span><span>G</span><span>B</span><span>e</span>
-        </div>
+    <div class="string-selector">
+        <div class="string" data-note="e">e<span>1</span></div>
+        <div class="string" data-note="B">B<span>2</span></div>
+        <div class="string" data-note="G">G<span>3</span></div>
+        <div class="string" data-note="D">D<span>4</span></div>
+        <div class="string" data-note="A">A<span>5</span></div>
+        <div class="string active" data-note="E">E<span>6</span></div>
+    </div>
 
-        <button id="start-btn">INICIAR AFINADOR</button>
-    </main>
-
-    <script src="script.js"></script>
-</body>
-</html>
+    <button id="start-btn">LIGAR</button>
+</main>

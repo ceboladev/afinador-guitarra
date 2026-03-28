@@ -59,25 +59,24 @@ function update() {
     analyser.getFloatTimeDomainData(buffer);
     const frequency = autoCorrelate(buffer, audioCtx.sampleRate);
 
-    if (frequency !== -1) {
+    // Dentro da função update()
+if (frequency !== -1) {
     const note = getNote(frequency);
-    noteNameEl.innerText = note.name;
-    freqEl.innerText = frequency.toFixed(2) + " Hz";
-    
-    // Rotação do ponteiro
-    pointer.style.transform = `rotate(${note.detune}deg)`;
+    const rotation = note.detune * 1.5; // Ajuste de sensibilidade do arco
 
-    // Efeito visual: se estiver perto de 0 (afinado), muda a cor
+    pointer.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+    noteNameEl.innerText = note.name;
+    freqEl.innerText = frequency.toFixed(1) + " Hz";
+
+    // Se estiver afinado (entre -5 e 5 cents)
     if (Math.abs(note.detune) < 5) {
-        pointer.style.background = "var(--success)";
-        pointer.style.boxShadow = "0 0 20px var(--success)";
-        noteNameEl.style.color = "var(--success)";
+        noteNameEl.style.color = "var(--cifra-green)";
+        pointer.style.background = "var(--cifra-green)";
     } else {
-        pointer.style.background = "linear-gradient(to top, var(--primary), transparent)";
-        pointer.style.boxShadow = "0 0 15px var(--primary)";
         noteNameEl.style.color = "white";
+        pointer.style.background = "var(--cifra-orange)";
     }
-};
+}
 }
 
 // Algoritmo simples de Autocorrelação para detectar o pitch

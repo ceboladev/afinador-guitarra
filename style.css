@@ -1,114 +1,129 @@
 :root {
-    --primary: #00f2ff;
-    --accent: #7000ff;
-    --success: #00ff88;
-    --danger: #ff3860;
-    --bg: #0a0a0c;
+    --cifra-orange: #FF6B00;
+    --cifra-bg: #121212;
+    --cifra-card: #1C1C1C;
+    --cifra-gray: #333333;
+    --cifra-green: #2ecc71;
 }
 
 body {
-    margin: 0;
-    background-color: var(--bg);
-    color: white;
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--cifra-bg);
+    font-family: 'Roboto', sans-serif;
     display: flex;
     justify-content: center;
+    padding-top: 50px;
+    margin: 0;
+}
+
+.cifra-tuner {
+    width: 350px;
+    background: var(--cifra-card);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.header-cifra {
+    display: flex;
     align-items: center;
-    min-height: 100vh;
+    gap: 10px;
+    color: #999;
+    font-size: 14px;
+    margin-bottom: 30px;
+}
+
+/* O Arco */
+.arc-container {
+    position: relative;
+    width: 260px;
+    height: 130px;
+    margin: 0 auto;
     overflow: hidden;
 }
 
-/* Fundo com efeito de luzes */
-.bg-blobs {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: radial-gradient(circle at 20% 30%, #1d1033 0%, transparent 40%),
-                radial-gradient(circle at 80% 70%, #0a2222 0%, transparent 40%);
-    z-index: -1;
-}
-
-.tuner-card {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 2rem;
-    border-radius: 30px;
-    width: 90%;
-    max-width: 400px;
-    text-align: center;
-    box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-}
-
-h1 { font-weight: 300; letter-spacing: 2px; margin-bottom: 2rem; }
-h1 span { color: var(--primary); font-weight: 800; }
-
-/* O Medidor (Gauge) */
-.gauge-wrapper {
-    position: relative;
-    width: 100%;
-    height: 180px;
-    margin-bottom: 20px;
-    border-bottom: 2px solid rgba(255,255,255,0.1);
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-}
-
-.pointer {
-    width: 3px;
-    height: 150px;
-    background: linear-gradient(to top, var(--primary), transparent);
-    transform-origin: bottom center;
-    transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    z-index: 5;
-    box-shadow: 0 0 15px var(--primary);
-}
-
-.center-target {
-    position: absolute;
-    bottom: -5px;
-    width: 10px;
-    height: 10px;
-    background: var(--success);
+.arc-bg {
+    width: 260px;
+    height: 260px;
+    border: 8px solid var(--cifra-gray);
     border-radius: 50%;
-    box-shadow: 0 0 20px var(--success);
+    box-sizing: border-box;
 }
 
-/* Display de Nota */
-.note-display {
-    margin: 1.5rem 0;
+.pointer-cifra {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 4px;
+    height: 110px;
+    background: var(--cifra-orange);
+    transform-origin: bottom center;
+    transform: translateX(-50%) rotate(0deg);
+    z-index: 10;
+    transition: transform 0.1s ease-out;
 }
 
-#note-name {
-    display: block;
-    font-size: 5rem;
-    font-weight: 900;
-    text-shadow: 0 0 30px rgba(0, 242, 255, 0.3);
+.center-marker {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 4px;
+    height: 20px;
+    background: var(--cifra-green);
+    transform: translateX(-50%);
 }
 
-#frequency {
-    color: rgba(255,255,255,0.5);
-    letter-spacing: 1px;
+/* Nota e Frequência */
+.note-info h2 {
+    font-size: 80px;
+    margin: 10px 0;
+    color: white;
 }
 
-/* Botão Estilizado */
+.note-info p {
+    color: #666;
+    margin-top: -10px;
+}
+
+/* Seletor de Cordas */
+.string-selector {
+    display: flex;
+    justify-content: space-between;
+    margin: 30px 0;
+    border-top: 1px solid var(--cifra-gray);
+    padding-top: 20px;
+}
+
+.string {
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--cifra-gray);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.string span { font-size: 10px; }
+
+.string.active {
+    border-color: var(--cifra-orange);
+    color: var(--cifra-orange);
+    background: rgba(255, 107, 0, 0.1);
+}
+
 #start-btn {
+    background: var(--cifra-orange);
+    border: none;
     width: 100%;
     padding: 15px;
-    border-radius: 15px;
-    border: none;
-    background: linear-gradient(45deg, var(--primary), var(--accent));
+    border-radius: 8px;
     color: white;
     font-weight: bold;
-    font-size: 1rem;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-#start-btn:active { transform: scale(0.95); }
-
-/* Responsividade */
-@media (max-width: 480px) {
-    .tuner-card { padding: 1.5rem; }
-    #note-name { font-size: 4rem; }
 }

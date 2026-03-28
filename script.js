@@ -80,6 +80,15 @@ function update() {
     console.log("Frequência detectada:", frequency);
 
     if (frequency !== -1 && frequency > 20 && frequency < 2000) {
+
+        // Remove o brilho de todas as cordas primeiro
+document.querySelectorAll('.string').forEach(s => s.classList.remove('active'));
+
+// Procura a corda que corresponde à nota detectada e faz brilhar
+const activeString = document.querySelector(`.string[data-note*="${note.name}"]`);
+if (activeString) {
+    activeString.classList.add('active');
+}
         const note = getNote(frequency);
         const rotation = note.detune * 1.5; 
 

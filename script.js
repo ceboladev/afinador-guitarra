@@ -24,33 +24,60 @@ function getNote(frequency) {
 }
 
 async function startTuner() {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const source = audioCtx.createMediaStreamSource(stream);
-    
-    analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 2048;
-    buffer = new Float32Array(analyser.fftSize);
-    source.connect(analyser);
-    
-    update();
-}
+    try {
+        // Cria o contexto de áudio apenas após o clique
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
 
+        // Verifica se o contexto está suspenso (comum em celulares)
+        if (audioCtx.state === 'suspended') {
+            await audioCtx.resume();
+        }
+
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+            audio: {
+                echoCancellation: false,
+                autoGainControl: false,
+                noiseSuppression: false
+            } 
+        });
+        
+        const source = audioCtx.createMediaStreamSource(stream);
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 4096; // Aumentei para dar mais precisão no celular
+        buffer = new Float32Array(analyser.fftSize);
+        source.connect(analyser);
+        
+        update();
+    } catch (err) {
+        console.error("Erro ao acessar microfone: ", err);
+        alert("Por favor, permita o acesso ao microfone nas configurações do navegador.");
+    }
+}
 function update() {
     analyser.getFloatTimeDomainData(buffer);
     const frequency = autoCorrelate(buffer, audioCtx.sampleRate);
 
     if (frequency !== -1) {
-        const note = getNote(frequency);
-        noteNameEl.innerText = note.name;
-        freqEl.innerText = frequency.toFixed(2);
-        
-        // Move o ponteiro: detune varia de -50 a 50
-        const rotation = note.detune; 
-        pointer.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
-    }
+    const note = getNote(frequency);
+    noteNameEl.innerText = note.name;
+    freqEl.innerText = frequency.toFixed(2) + " Hz";
     
-    requestAnimationFrame(update);
+    // Rotação do ponteiro
+    pointer.style.transform = `rotate(${note.detune}deg)`;
+
+    // Efeito visual: se estiver perto de 0 (afinado), muda a cor
+    if (Math.abs(note.detune) < 5) {
+        pointer.style.background = "var(--success)";
+        pointer.style.boxShadow = "0 0 20px var(--success)";
+        noteNameEl.style.color = "var(--success)";
+    } else {
+        pointer.style.background = "linear-gradient(to top, var(--primary), transparent)";
+        pointer.style.boxShadow = "0 0 15px var(--primary)";
+        noteNameEl.style.color = "white";
+    }
+};
 }
 
 // Algoritmo simples de Autocorrelação para detectar o pitch
@@ -60,7 +87,7 @@ function autoCorrelate(buffer, sampleRate) {
     for (let i = 0; i < SIZE; i++) {
         rms += buffer[i] * buffer[i];
     }
-    if (Math.sqrt(rms / SIZE) < 0.05) return -1; // Silêncio
+    if (Math.sqrt(rms / SIZE) < 0.01) return -1; // Silêncio
 
     let r1 = 0, r2 = SIZE - 1, thres = 0.2;
     for (let i = 0; i < SIZE / 2; i++) {

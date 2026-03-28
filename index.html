@@ -2,23 +2,39 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Afinador Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Afinador Pro Max</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="tuner-container">
-        <h1>Afinador</h1>
-        <div class="gauge">
-            <div class="meter"></div>
+    <div class="bg-blobs"></div>
+    
+    <main class="tuner-card">
+        <header>
+            <h1>Tuner<span>.js</span></h1>
+            <div id="status-dot" class="dot"></div>
+        </header>
+
+        <div class="gauge-wrapper">
+            <div class="scale-marks"></div>
             <div class="pointer" id="pointer"></div>
-            <div class="center-line"></div>
+            <div class="center-target"></div>
         </div>
-        <div class="notes">
-            <span id="note-name">-</span>
+
+        <div class="display-section">
+            <div class="note-display">
+                <span id="note-name">--</span>
+                <small id="frequency">0.00 Hz</small>
+            </div>
         </div>
-        <div class="frequency"><span id="frequency">0</span> Hz</div>
-        <button id="start-btn">Ligar Afinador</button>
-    </div>
+
+        <div class="strings-hint">
+            <span>E</span><span>A</span><span>D</span><span>G</span><span>B</span><span>e</span>
+        </div>
+
+        <button id="start-btn">INICIAR AFINADOR</button>
+    </main>
+
     <script src="script.js"></script>
 </body>
 </html>

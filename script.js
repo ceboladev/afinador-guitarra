@@ -64,7 +64,7 @@ if (frequency !== -1) {
     const note = getNote(frequency);
     const rotation = note.detune * 1.5; // Ajuste de sensibilidade do arco
 
-    pointer.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+    pointer.style.transform = `translateX(-50%) rotate(${note.detune}deg)`;
     noteNameEl.innerText = note.name;
     freqEl.innerText = frequency.toFixed(1) + " Hz";
 

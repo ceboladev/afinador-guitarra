@@ -1,30 +1,45 @@
-<main class="cifra-tuner">
-    <div class="header-cifra">
-        <img src="https://www.cifraclub.com.br/favicon.ico" width="20" alt="logo">
-        <span>Afinador Cifra Club Style</span>
-    </div>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Afinador Cifra Style</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-    <div class="tuner-display">
-        <div class="arc-container">
-            <div class="arc-bg"></div>
-            <div class="pointer-cifra" id="pointer"></div>
-            <div class="center-marker"></div>
+    <main class="cifra-tuner">
+        <header class="header-cifra">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#FF6B00"><path d="M12 2L2 19.74V22h20v-2.26L12 2zm0 4.47l7.19 12.53H4.81L12 6.47z"/></svg>
+            <span>AFINADOR PRO</span>
+        </header>
+
+        <div class="tuner-display">
+            <div class="arc-container">
+                <div class="arc-bg"></div>
+                <div class="pointer-cifra" id="pointer"></div>
+                <div class="center-marker"></div>
+            </div>
+            
+            <div class="note-info">
+                <h2 id="note-name">--</h2>
+                <p id="frequency">0.0 Hz</p>
+            </div>
         </div>
-        
-        <div class="note-info">
-            <h2 id="note-name">E</h2>
-            <p id="frequency">0.0 Hz</p>
+
+        <div class="string-selector">
+            <div class="string" data-note="E4">e<span>1</span></div>
+            <div class="string" data-note="B3">B<span>2</span></div>
+            <div class="string" data-note="G3">G<span>3</span></div>
+            <div class="string" data-note="D3">D<span>4</span></div>
+            <div class="string" data-note="A2">A<span>5</span></div>
+            <div class="string active" data-note="E2">E<span>6</span></div>
         </div>
-    </div>
 
-    <div class="string-selector">
-        <div class="string" data-note="e">e<span>1</span></div>
-        <div class="string" data-note="B">B<span>2</span></div>
-        <div class="string" data-note="G">G<span>3</span></div>
-        <div class="string" data-note="D">D<span>4</span></div>
-        <div class="string" data-note="A">A<span>5</span></div>
-        <div class="string active" data-note="E">E<span>6</span></div>
-    </div>
+        <button id="start-btn">LIGAR AFINADOR</button>
+    </main>
 
-    <button id="start-btn">LIGAR</button>
-</main>
+    <script src="script.js"></script>
+</body>
+</html>

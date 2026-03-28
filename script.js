@@ -60,7 +60,7 @@ function autoCorrelate(buffer, sampleRate) {
     for (let i = 0; i < SIZE; i++) {
         rms += buffer[i] * buffer[i];
     }
-    if (Math.sqrt(rms / SIZE) < 0.01) return -1; // Silêncio
+    if (Math.sqrt(rms / SIZE) < 0.05) return -1; // Silêncio
 
     let r1 = 0, r2 = SIZE - 1, thres = 0.2;
     for (let i = 0; i < SIZE / 2; i++) {
